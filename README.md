@@ -8,7 +8,7 @@ You will need an amazon account, and credentials stored within `$HOME/.aws/crede
 All dependencies are installed via docker container and bash script. You will need, at minimum docker installed. If you want to use encrypted terraform values, then you will need [sops](https://github.com/getsops/sops). This run script will handle descrypting the file for you. I recommend AWS KMS for the encryption key.
 
 ```shell
-docker build -t dev-env .
+docker build -t aws-network .
 ```
 
 ## Build the amazon image
@@ -16,7 +16,7 @@ docker build -t dev-env .
 Once the docker image is built, you may shell into the container.
 
 ```shell
-docker run --rm -it  -v <path to .aws folder>:/root/.aws -v $PWD:/workspace dev-env bash
+docker run --rm -it  -v <path to .aws folder>:/root/.aws -v $PWD:/workspace aws-network bash
 ```
 
 Once inside the container you can build the development image. This image is setup for some basic depenendcies including, Ruby, NodeJS, and Docker. It is setup with SSH access and uses Google Authenticator and private keys to handle authentication. This image is built using packer, and can be customized, or new custom images can be defined and built.
