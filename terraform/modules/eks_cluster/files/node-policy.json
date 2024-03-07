@@ -1,0 +1,232 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Resource" : "*",
+      "Action"   : "iam:CreateServiceLinkedRole",
+      "Effect"   : "Allow",
+
+      "Condition": {
+        "StringEquals": {
+          "iam:AWSServiceName": "elasticloadbalancing.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Resource" : "*",
+      "Effect"   : "Allow",
+      "Action" : [
+        "elasticloadbalancing:DescribeTargetGroupAttributes",
+        "elasticloadbalancing:DescribeLoadBalancerAttributes",
+        "elasticloadbalancing:DescribeListenerCertificates",
+        "elasticloadbalancing:DescribeLoadBalancers",
+        "elasticloadbalancing:DescribeTargetGroups",
+        "elasticloadbalancing:DescribeTargetHealth",
+        "elasticloadbalancing:DescribeSSLPolicies",
+        "elasticloadbalancing:DescribeListeners",
+        "elasticloadbalancing:DescribeRules",
+        "elasticloadbalancing:DescribeTags",
+
+        "ec2:DescribeVpcPeeringConnections",
+        "ec2:DescribeAccountAttributes",
+        "ec2:DescribeAvailabilityZones",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DescribeInternetGateways",
+        "ec2:DescribeSecurityGroups",
+        "ec2:DescribeInstances",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeCoipPools",
+        "ec2:GetCoipPoolUsage",
+        "ec2:DescribeSubnets",
+        "ec2:DescribeTags",
+        "ec2:DescribeVpcs"
+      ]
+    },
+    {
+      "Resource" : "*",
+      "Effect"   : "Allow",
+      "Action" : [
+        "cognito-idp:DescribeUserPoolClient",
+        "waf-regional:GetWebACLForResource",
+        "waf-regional:DisassociateWebACL",
+        "waf-regional:AssociateWebACL",
+        "waf-regional:GetWebACL",
+
+        "wafv2:GetWebACLForResource",
+        "wafv2:DisassociateWebACL",
+        "wafv2:AssociateWebACL",
+        "wafv2:GetWebACL",
+
+        "shield:GetSubscriptionState",
+        "shield:DescribeProtection",
+        "shield:CreateProtection",
+        "shield:DeleteProtection",
+
+        "iam:ListServerCertificates",
+        "iam:GetServerCertificate",
+        "acm:DescribeCertificate",
+        "acm:ListCertificates",
+        "acm:GetCertificate"
+      ]
+    },
+    {
+      "Resource" : "*",
+      "Effect"   : "Allow",
+      "Action" : [
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:RevokeSecurityGroupIngress"
+      ]
+    },
+    {
+      "Resource" : "*",
+      "Effect"   : "Allow",
+      "Action" : [
+        "ec2:CreateSecurityGroup"
+      ]
+    },
+    {
+      "Resource" : "arn:aws:ec2:*:*:security-group/*",
+      "Action"   : ["ec2:CreateTags"],
+      "Effect"   : "Allow",
+
+      "Condition" : {
+        "StringEquals" : { "ec2:CreateAction": "CreateSecurityGroup" },
+        "Null" : { "aws:RequestTag/elbv2.k8s.aws/cluster": "false" }
+      }
+    },
+    {
+      "Resource" : "arn:aws:ec2:*:*:security-group/*",
+      "Effect"   : "Allow",
+      "Action" : [
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ],
+
+      "Condition" : {
+        "Null" : {
+          "aws:ResourceTag/elbv2.k8s.aws/cluster" : "false",
+          "aws:RequestTag/elbv2.k8s.aws/cluster"  : "true"
+        }
+      }
+    },
+    {
+      "Resource" : "*",
+      "Effect"   : "Allow",
+      "Action" : [
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:RevokeSecurityGroupIngress",
+        "ec2:DeleteSecurityGroup"
+      ],
+
+      "Condition" : {
+        "Null" : { "aws:ResourceTag/elbv2.k8s.aws/cluster" : "false" }
+      }
+    },
+    {
+      "Resource" : "*",
+      "Effect"   : "Allow",
+      "Action" : [
+        "elasticloadbalancing:CreateLoadBalancer",
+        "elasticloadbalancing:CreateTargetGroup"
+      ],
+
+      "Condition" : {
+        "Null" : { "aws:RequestTag/elbv2.k8s.aws/cluster" : "false" }
+      }
+    },
+    {
+      "Resource" : "*",
+      "Effect"   : "Allow",
+      "Action" : [
+        "elasticloadbalancing:CreateListener",
+        "elasticloadbalancing:DeleteListener",
+        "elasticloadbalancing:CreateRule",
+        "elasticloadbalancing:DeleteRule"
+      ]
+    },
+    {
+      "Effect" : "Allow",
+      "Resource" : [
+        "arn:aws:elasticloadbalancing:*:*:loadbalancer/net/*/*",
+        "arn:aws:elasticloadbalancing:*:*:loadbalancer/app/*/*",
+        "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*"
+      ],
+      "Action" : [
+        "elasticloadbalancing:AddTags",
+        "elasticloadbalancing:RemoveTags"
+      ],
+      "Condition" : {
+        "Null" : {
+          "aws:RequestTag/elbv2.k8s.aws/cluster": "true",
+          "aws:ResourceTag/elbv2.k8s.aws/cluster": "false"
+        }
+      }
+    },
+    {
+      "Effect" : "Allow",
+      "Resource" : [
+        "arn:aws:elasticloadbalancing:*:*:listener-rule/net/*/*/*",
+        "arn:aws:elasticloadbalancing:*:*:listener-rule/app/*/*/*",
+        "arn:aws:elasticloadbalancing:*:*:listener/net/*/*/*",
+        "arn:aws:elasticloadbalancing:*:*:listener/app/*/*/*"
+      ],
+      "Action" : [
+        "elasticloadbalancing:RemoveTags",
+        "elasticloadbalancing:AddTags"
+      ]
+    },
+    {
+      "Resource" : "*",
+      "Effect"   : "Allow",
+      "Action" : [
+          "elasticloadbalancing:ModifyLoadBalancerAttributes",
+          "elasticloadbalancing:SetIpAddressType",
+          "elasticloadbalancing:SetSecurityGroups",
+          "elasticloadbalancing:SetSubnets",
+          "elasticloadbalancing:DeleteLoadBalancer",
+          "elasticloadbalancing:ModifyTargetGroup",
+          "elasticloadbalancing:ModifyTargetGroupAttributes",
+          "elasticloadbalancing:DeleteTargetGroup"
+      ],
+      "Condition" : {
+        "Null" : { "aws:ResourceTag/elbv2.k8s.aws/cluster" : "false" }
+      }
+    },
+    {
+      "Resource" : "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
+      "Effect"   : "Allow",
+      "Action" : [
+        "elasticloadbalancing:DeregisterTargets",
+        "elasticloadbalancing:RegisterTargets"
+      ]
+    },
+    {
+      "Resource" : "*",
+      "Effect"   : "Allow",
+      "Action" : [
+        "elasticloadbalancing:RemoveListenerCertificates",
+        "elasticloadbalancing:AddListenerCertificates",
+        "elasticloadbalancing:ModifyListener",
+        "elasticloadbalancing:ModifyRule",
+        "elasticloadbalancing:SetWebAcl"
+      ]
+    },
+    {
+      "Resource" : ["arn:aws:route53:::hostedzone/*"],
+      "Effect"   : "Allow",
+      "Action" : [
+        "route53:ChangeResourceRecordSets"
+      ]
+    },
+    {
+      "Resource" : ["*"],
+      "Effect"   : "Allow",
+      "Action" : [
+        "route53:ListResourceRecordSets",
+        "route53:ListHostedZonesByName",
+        "route53:ListHostedZones",
+        "route53:GetChange"
+      ]
+    }
+  ]
+}

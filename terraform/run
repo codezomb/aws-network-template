@@ -1,0 +1,77 @@
+#!/bin/bash
+
+trap clean EXIT
+set -e
+
+# ------------------------------------------------------------------------------------------
+# Run the terraform intiialization and configuration process
+# ------------------------------------------------------------------------------------------
+
+configuration() {
+  if [[ ! -e $working_dir ]]; then
+    >&2 echo "${working_dir} is not a valid location. Check the location and try again."
+    exit 1
+  fi
+
+  # Initialize the terraform environment
+  cd $working_dir && terraform init
+
+  # Initialize the terraform workspace
+  [[ $(terraform workspace list | grep $workspace) ]] && \
+    terraform workspace select $workspace || terraform workspace new $workspace
+
+  # Decrypt the tfvars if one exists
+  [[ -f "secrets/${workspace}.tfvars" ]] && \
+    sops -d "secrets/${workspace}.tfvars" > terraform.tfvars || true
+}
+
+# ------------------------------------------------------------------------------------------
+# Function to output useful usage information
+# ------------------------------------------------------------------------------------------
+
+help() {
+  echo
+  echo "Usage:"
+  echo "  -w Specify the terraform workspace. (optional)"
+  echo "  -q silence configuration output."
+  echo "  -h Display this help message."
+  echo
+}
+
+# ------------------------------------------------------------------------------------------
+# Clean up the working environment
+# ------------------------------------------------------------------------------------------
+
+clean() {
+  rm -rf \
+    terraform.tfvars \
+    .terraform \
+    *.tfstate
+}
+
+###################################################
+
+working_dir="$(dirname $0)"
+workspace="default"
+
+while getopts "d:w:qh" opt; do
+  case ${opt} in
+    w) workspace=$OPTARG ;;
+    q) quiet=1 ;;
+    h) help && exit 0 ;;
+    ?)
+      echo "Invalid Option: -$OPTARG" 1>&2
+      help && exit 1
+      ;;
+  esac
+done
+
+shift $((OPTIND -1))
+
+if [[ ! -z $quiet ]]; then
+  configuration > /dev/null
+else
+  configuration
+fi
+
+eval "terraform ${@}"

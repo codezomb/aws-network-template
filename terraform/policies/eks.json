@@ -1,0 +1,55 @@
+{
+  "Version"   : "2012-10-17",
+  "Statement" : [
+    {
+      "Resource" : "arn:aws:iam::${account}:role/AccountDNSTrustedAccess",
+      "Action"   : "sts:AssumeRole",
+      "Effect"   : "Allow"
+    },
+    {
+      "Resource" : "*",
+      "Effect" : "Allow",
+      "Action" : [
+        "elasticfilesystem:DeleteAccessPoint",
+        "elasticfilesystem:TagResource"
+      ],
+      "Condition" : {
+        "StringEquals": {
+          "aws:ResourceTag/efs.csi.aws.com/cluster": "true"
+        }
+      }
+    },
+    {
+      "Resource" : "*",
+      "Action" : "elasticfilesystem:CreateAccessPoint",
+      "Effect" : "Allow",
+      "Condition" : {
+        "StringLike": {
+          "aws:RequestTag/efs.csi.aws.com/cluster": "true"
+        }
+      }
+    },
+    {
+      "Resource" : "*",
+      "Effect" : "Allow",
+      "Action" : [
+        "elasticfilesystem:DescribeMountTargets",
+        "elasticfilesystem:DescribeAccessPoints",
+        "elasticfilesystem:DescribeFileSystems",
+        "ec2:DescribeAvailabilityZones",
+        "elasticloadbalancing:AddTags"
+      ]
+    },
+    {
+      "Resource" : "${kms_key}",
+      "Effect" : "Allow",
+      "Action" : [
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey",
+        "kms:ReEncrypt*",
+        "kms:Encrypt",
+        "kms:Decrypt"
+      ]
+    }
+  ]
+}

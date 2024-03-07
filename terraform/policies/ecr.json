@@ -1,0 +1,16 @@
+{
+  "Effect": "Allow",
+  "Action": [
+    "ecr:BatchCheckLayerAvailability",
+    "ecr:GetDownloadUrlForLayer",
+    "ecr:DescribeRepositories",
+    "ecr:GetRepositoryPolicy",
+    "ecr:DescribeImages",
+    "ecr:BatchGetImage",
+    "ecr:ListImages"
+  ],
+
+  "Principal": {
+    "AWS": "${account}"
+  }
+} 
